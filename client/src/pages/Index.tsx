@@ -256,7 +256,7 @@ const Index = () => {
           </p>
           
           <div className="flex justify-center">
-            <Button onClick={scrollToContact} size="lg" className="glass-button-primary text-white px-8 py-4 text-lg group transition-all duration-300">
+            <Button onClick={scrollToContact} size="lg" className="bg-gradient-to-r from-primary to-purple-600 text-white px-8 py-4 text-lg group hover:scale-105 hover:shadow-2xl transition-all duration-300">
               Start Your Message
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
