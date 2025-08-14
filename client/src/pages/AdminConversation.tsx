@@ -58,16 +58,26 @@ const AdminConversation = () => {
         audio.volume = 0.35;
         audio.loop = true;
         
-        const playMusic = () => {
-          audio.play().catch(e => console.log('Audio autoplay prevented:', e));
+        // Auto-play music with fallback for user interaction
+        const playMusic = async () => {
+          try {
+            await audio.play();
+          } catch (e) {
+            console.log('Auto-play prevented, waiting for user interaction:', e);
+            // Fallback: play on first user interaction
+            const startOnInteraction = () => {
+              audio.play().catch(console.log);
+              document.removeEventListener('click', startOnInteraction);
+              document.removeEventListener('touchstart', startOnInteraction);
+            };
+            
+            document.addEventListener('click', startOnInteraction, { once: true });
+            document.addEventListener('touchstart', startOnInteraction, { once: true });
+          }
         };
 
-        const startMusic = () => {
-          playMusic();
-          document.removeEventListener('click', startMusic);
-        };
-
-        document.addEventListener('click', startMusic, { once: true });
+        // Try to auto-play immediately
+        playMusic();
       }
     };
 

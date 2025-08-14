@@ -23,45 +23,67 @@ const Index = () => {
     window.addEventListener('scroll', handleScroll);
     setIsVisible(true);
 
-    // Setup background music with fade in/out and low volume
+    // Setup background music with auto-play and fade effects
     const setupBackgroundMusic = () => {
       if (audioRef.current) {
         const audio = audioRef.current;
         audio.volume = 0.35; // Set volume to 35%
         audio.loop = true;
         
-        // Simple play function
-        const playMusic = () => {
-          audio.play().catch(e => console.log('Audio autoplay prevented:', e));
+        // Smooth fade out function (2 seconds)
+        const fadeOut = (duration = 2000) => {
+          const startVolume = audio.volume;
+          const steps = 60; // 60 steps for smooth fade
+          const volumeStep = startVolume / steps;
+          const timeStep = duration / steps;
+          
+          const fadeInterval = setInterval(() => {
+            if (audio.volume > 0) {
+              audio.volume = Math.max(audio.volume - volumeStep, 0);
+            } else {
+              audio.pause();
+              clearInterval(fadeInterval);
+            }
+          }, timeStep);
         };
 
-        // Handle page visibility change
-        const handleVisibilityChange = () => {
-          if (document.visibilityState === 'visible') {
-            playMusic();
-          } else {
-            audio.pause();
+        // Auto-play music with fallback for user interaction
+        const playMusic = async () => {
+          try {
+            await audio.play();
+          } catch (e) {
+            console.log('Auto-play prevented, waiting for user interaction:', e);
+            // Fallback: play on first user interaction
+            const startOnInteraction = () => {
+              audio.play().catch(console.log);
+              document.removeEventListener('click', startOnInteraction);
+              document.removeEventListener('touchstart', startOnInteraction);
+              document.removeEventListener('keydown', startOnInteraction);
+            };
+            
+            document.addEventListener('click', startOnInteraction, { once: true });
+            document.addEventListener('touchstart', startOnInteraction, { once: true });
+            document.addEventListener('keydown', startOnInteraction, { once: true });
           }
         };
 
-        // Start music after user interaction (required by browsers)
-        const startMusic = () => {
-          playMusic();
-          document.removeEventListener('click', startMusic);
-          document.removeEventListener('keydown', startMusic);
-          document.removeEventListener('touchstart', startMusic);
+        // Handle page visibility change with fade out
+        const handleVisibilityChange = () => {
+          if (document.visibilityState === 'visible') {
+            audio.volume = 0.35;
+            playMusic();
+          } else {
+            fadeOut(2000); // 2 second fade out
+          }
         };
 
-        document.addEventListener('click', startMusic, { once: true });
-        document.addEventListener('keydown', startMusic, { once: true });
-        document.addEventListener('touchstart', startMusic, { once: true });
+        // Try to auto-play immediately
+        playMusic();
+        
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
         return () => {
           document.removeEventListener('visibilitychange', handleVisibilityChange);
-          document.removeEventListener('click', startMusic);
-          document.removeEventListener('keydown', startMusic);
-          document.removeEventListener('touchstart', startMusic);
         };
       }
     };
@@ -234,7 +256,7 @@ const Index = () => {
           </p>
           
           <div className="flex justify-center">
-            <Button onClick={scrollToContact} size="lg" className="bg-gradient-to-r from-primary to-purple-600 text-white px-8 py-4 text-lg group hover:scale-105 hover:shadow-2xl transition-all duration-300">
+            <Button onClick={scrollToContact} size="lg" className="glass-button-primary text-white px-8 py-4 text-lg group transition-all duration-300">
               Start Your Message
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>

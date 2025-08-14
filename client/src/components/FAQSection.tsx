@@ -55,11 +55,11 @@ const FAQSection = () => {
 
         <div className="space-y-4">
           {faqs.map((faq, index) => (
-            <Card key={index} className="border-0 bg-gradient-to-br from-background to-muted/30 hover:shadow-lg transition-all duration-300">
+            <Card key={index} className="border-0 glass-premium rounded-2xl hover:shadow-xl transition-all duration-300">
               <CardContent className="p-0">
                 <button
                   onClick={() => toggleItem(index)}
-                  className="w-full p-6 text-left flex justify-between items-center hover:bg-muted/20 transition-colors duration-200"
+                  className="w-full p-6 text-left flex justify-between items-center hover:bg-white/10 transition-all duration-300 rounded-2xl"
                 >
                   <h3 className="text-lg font-semibold pr-4">{faq.question}</h3>
                   {openItems.includes(index) ? (
