@@ -58,26 +58,39 @@ const AdminConversation = () => {
         audio.volume = 0.35;
         audio.loop = true;
         
-        // Auto-play music with fallback for user interaction
+        // Auto-play music with aggressive mobile support
         const playMusic = async () => {
           try {
             await audio.play();
+            console.log('Music started automatically');
           } catch (e) {
-            console.log('Auto-play prevented, waiting for user interaction:', e);
-            // Fallback: play on first user interaction
+            console.log('Auto-play prevented, setting up interaction listeners:', e);
             const startOnInteraction = () => {
-              audio.play().catch(console.log);
-              document.removeEventListener('click', startOnInteraction);
-              document.removeEventListener('touchstart', startOnInteraction);
+              audio.play().then(() => {
+                console.log('Music started after user interaction');
+                document.removeEventListener('click', startOnInteraction);
+                document.removeEventListener('touchstart', startOnInteraction);
+                document.removeEventListener('touchend', startOnInteraction);
+                document.removeEventListener('scroll', startOnInteraction);
+              }).catch(console.log);
             };
             
             document.addEventListener('click', startOnInteraction, { once: true });
             document.addEventListener('touchstart', startOnInteraction, { once: true });
+            document.addEventListener('touchend', startOnInteraction, { once: true });
+            document.addEventListener('scroll', startOnInteraction, { once: true });
           }
         };
 
-        // Try to auto-play immediately
+        // Try immediate auto-play
         playMusic();
+        
+        // Also try after a short delay for mobile browsers
+        setTimeout(() => {
+          if (audio.paused) {
+            playMusic();
+          }
+        }, 100);
       }
     };
 

@@ -47,23 +47,34 @@ const Index = () => {
           }, timeStep);
         };
 
-        // Auto-play music with fallback for user interaction
+        // Auto-play music with aggressive mobile support
         const playMusic = async () => {
           try {
             await audio.play();
+            console.log('Music started automatically');
           } catch (e) {
-            console.log('Auto-play prevented, waiting for user interaction:', e);
-            // Fallback: play on first user interaction
+            console.log('Auto-play prevented, setting up interaction listeners:', e);
+            // Multiple fallback strategies for mobile
             const startOnInteraction = () => {
-              audio.play().catch(console.log);
-              document.removeEventListener('click', startOnInteraction);
-              document.removeEventListener('touchstart', startOnInteraction);
-              document.removeEventListener('keydown', startOnInteraction);
+              audio.play().then(() => {
+                console.log('Music started after user interaction');
+                // Remove all listeners once music starts
+                document.removeEventListener('click', startOnInteraction);
+                document.removeEventListener('touchstart', startOnInteraction);
+                document.removeEventListener('touchend', startOnInteraction);
+                document.removeEventListener('keydown', startOnInteraction);
+                document.removeEventListener('scroll', startOnInteraction);
+                window.removeEventListener('focus', startOnInteraction);
+              }).catch(console.log);
             };
             
+            // Add multiple interaction listeners for better mobile coverage
             document.addEventListener('click', startOnInteraction, { once: true });
             document.addEventListener('touchstart', startOnInteraction, { once: true });
+            document.addEventListener('touchend', startOnInteraction, { once: true });
             document.addEventListener('keydown', startOnInteraction, { once: true });
+            document.addEventListener('scroll', startOnInteraction, { once: true });
+            window.addEventListener('focus', startOnInteraction, { once: true });
           }
         };
 
@@ -77,8 +88,15 @@ const Index = () => {
           }
         };
 
-        // Try to auto-play immediately
+        // Try immediate auto-play
         playMusic();
+        
+        // Also try after a short delay for mobile browsers
+        setTimeout(() => {
+          if (audio.paused) {
+            playMusic();
+          }
+        }, 100);
         
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
