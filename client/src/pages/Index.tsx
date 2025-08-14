@@ -27,9 +27,10 @@ const Index = () => {
     const setupBackgroundMusic = () => {
       if (audioRef.current) {
         const audio = audioRef.current;
-        audio.volume = 0.35; // Set volume to 35%
+        audio.volume = 0.15; // Set volume to 15% for softer sound
         audio.loop = true;
         audio.preload = 'auto';
+        audio.autoplay = true;
         audio.muted = false;
         
         // Smooth fade out function (2 seconds)
@@ -83,7 +84,7 @@ const Index = () => {
         // Handle page visibility change with fade out
         const handleVisibilityChange = () => {
           if (document.visibilityState === 'visible') {
-            audio.volume = 0.35;
+            audio.volume = 0.15;
             playMusic();
           } else {
             fadeOut(2000); // 2 second fade out

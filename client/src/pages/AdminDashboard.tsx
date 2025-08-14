@@ -46,9 +46,10 @@ const AdminDashboard = () => {
     const setupBackgroundMusic = () => {
       if (audioRef.current) {
         const audio = audioRef.current;
-        audio.volume = 0.35;
+        audio.volume = 0.15;
         audio.loop = true;
         audio.preload = 'auto';
+        audio.autoplay = true;
         audio.muted = false;
         
         // Auto-play music with aggressive mobile support
