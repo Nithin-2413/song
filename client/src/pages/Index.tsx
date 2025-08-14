@@ -29,6 +29,8 @@ const Index = () => {
         const audio = audioRef.current;
         audio.volume = 0.35; // Set volume to 35%
         audio.loop = true;
+        audio.preload = 'auto';
+        audio.muted = false;
         
         // Smooth fade out function (2 seconds)
         const fadeOut = (duration = 2000) => {
@@ -88,15 +90,24 @@ const Index = () => {
           }
         };
 
-        // Try immediate auto-play
-        playMusic();
-        
-        // Also try after a short delay for mobile browsers
-        setTimeout(() => {
-          if (audio.paused) {
-            playMusic();
+        // Force immediate play attempt
+        const forcePlay = () => {
+          audio.currentTime = 0;
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              console.log('Music started immediately');
+            }).catch(() => {
+              console.log('Immediate play blocked, setting up interaction triggers');
+            });
           }
-        }, 100);
+        };
+
+        // Try multiple immediate strategies
+        forcePlay();
+        
+        // Also set up the regular auto-play system
+        playMusic();
         
         document.addEventListener('visibilitychange', handleVisibilityChange);
 

@@ -48,6 +48,8 @@ const AdminDashboard = () => {
         const audio = audioRef.current;
         audio.volume = 0.35;
         audio.loop = true;
+        audio.preload = 'auto';
+        audio.muted = false;
         
         // Auto-play music with aggressive mobile support
         const playMusic = async () => {
@@ -73,15 +75,22 @@ const AdminDashboard = () => {
           }
         };
 
-        // Try immediate auto-play
-        playMusic();
-        
-        // Also try after a short delay for mobile browsers
-        setTimeout(() => {
-          if (audio.paused) {
-            playMusic();
+        // Force immediate play attempt
+        const forcePlay = () => {
+          audio.currentTime = 0;
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              console.log('Music started immediately');
+            }).catch(() => {
+              console.log('Immediate play blocked, setting up interaction triggers');
+            });
           }
-        }, 100);
+        };
+
+        // Try immediate strategies
+        forcePlay();
+        playMusic();
       }
     };
 
