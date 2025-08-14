@@ -66,39 +66,59 @@ const Index = () => {
           }, timeStep);
         };
 
-        // Simple mobile-friendly music play
+        // Aggressive auto-play for all devices
         const playMusic = async (useFadeIn = true) => {
-          try {
-            await audio.play();
+          const startAudio = () => {
             if (useFadeIn) {
               fadeIn(0.10, 3000);
             } else {
               audio.volume = 0.10;
             }
-            console.log('Music started automatically with fade in');
+          };
+
+          // Strategy 1: Direct play
+          try {
+            await audio.play();
+            startAudio();
+            console.log('Music started automatically');
+            return;
           } catch (e) {
-            console.log('Auto-play prevented, setting up mobile triggers:', e);
-            // Simple mobile interaction listeners
-            const startMusic = () => {
-              audio.play().then(() => {
-                if (useFadeIn) {
-                  fadeIn(0.10, 3000);
-                } else {
-                  audio.volume = 0.10;
-                }
-                console.log('Music started on mobile interaction');
-                // Clean up listeners
-                document.removeEventListener('touchstart', startMusic);
-                document.removeEventListener('click', startMusic);
-                document.removeEventListener('scroll', startMusic);
-              }).catch(console.log);
-            };
-            
-            // Add listeners for mobile interactions
-            document.addEventListener('touchstart', startMusic, { once: true, passive: true });
-            document.addEventListener('click', startMusic, { once: true });
-            document.addEventListener('scroll', startMusic, { once: true, passive: true });
+            console.log('Direct play failed, trying muted approach');
           }
+
+          // Strategy 2: Muted play then unmute
+          try {
+            audio.muted = true;
+            await audio.play();
+            audio.muted = false;
+            startAudio();
+            console.log('Music started with muted workaround');
+            return;
+          } catch (e) {
+            console.log('Muted approach failed, setting up interaction listeners');
+          }
+
+          // Strategy 3: Comprehensive interaction listeners
+          const startMusic = async () => {
+            try {
+              await audio.play();
+              startAudio();
+              console.log('Music started on user interaction');
+              // Remove all listeners
+              ['click', 'touchstart', 'touchend', 'scroll', 'mousemove', 'keydown', 'focus'].forEach(event => {
+                document.removeEventListener(event, startMusic);
+                window.removeEventListener(event, startMusic);
+              });
+            } catch (err) {
+              console.log('Failed to start music even with interaction:', err);
+            }
+          };
+            
+          // Add comprehensive interaction listeners
+          ['click', 'touchstart', 'touchend', 'scroll', 'mousemove', 'keydown'].forEach(event => {
+            document.addEventListener(event, startMusic, { once: true, passive: true });
+          });
+          window.addEventListener('focus', startMusic, { once: true });
         };
 
         // Handle page visibility change with fade out/in

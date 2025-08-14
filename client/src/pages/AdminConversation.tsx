@@ -61,26 +61,46 @@ const AdminConversation = () => {
         audio.autoplay = true;
         audio.muted = false;
         
-        // Simple mobile music play
+        // Aggressive auto-play for all devices  
         const playMusic = async () => {
+          // Strategy 1: Direct play
           try {
             await audio.play();
             console.log('Music started automatically');
+            return;
           } catch (e) {
-            console.log('Auto-play prevented, setting up mobile triggers:', e);
-            const startMusic = () => {
-              audio.play().then(() => {
-                console.log('Music started on mobile interaction');
-                document.removeEventListener('touchstart', startMusic);
-                document.removeEventListener('click', startMusic);
-                document.removeEventListener('scroll', startMusic);
-              }).catch(console.log);
-            };
-            
-            document.addEventListener('touchstart', startMusic, { once: true, passive: true });
-            document.addEventListener('click', startMusic, { once: true });
-            document.addEventListener('scroll', startMusic, { once: true, passive: true });
+            console.log('Direct play failed, trying muted approach');
           }
+
+          // Strategy 2: Muted play then unmute
+          try {
+            audio.muted = true;
+            await audio.play();
+            audio.muted = false;
+            console.log('Music started with muted workaround');
+            return;
+          } catch (e) {
+            console.log('Muted approach failed, setting up interaction listeners');
+          }
+
+          // Strategy 3: Comprehensive interaction listeners
+          const startMusic = async () => {
+            try {
+              await audio.play();
+              console.log('Music started on user interaction');
+              ['click', 'touchstart', 'touchend', 'scroll', 'mousemove', 'keydown', 'focus'].forEach(event => {
+                document.removeEventListener(event, startMusic);
+                window.removeEventListener(event, startMusic);
+              });
+            } catch (err) {
+              console.log('Failed to start music even with interaction:', err);
+            }
+          };
+            
+          ['click', 'touchstart', 'touchend', 'scroll', 'mousemove', 'keydown'].forEach(event => {
+            document.addEventListener(event, startMusic, { once: true, passive: true });
+          });
+          window.addEventListener('focus', startMusic, { once: true });
         };
 
         // Start music
