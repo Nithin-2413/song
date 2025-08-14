@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 - Successfully migrated project from Replit Agent to standard Replit environment
 - Fixed package dependencies (tsx, typescript, vite, esbuild)
 - Added all required environment variables for Supabase and Brevo email service
+- **EMAIL SUBJECTS & PREVIEWS UPDATED**:
+  - Admin notification: Subject "We got a Kabootar from {name}", Preview "Wakeup Chipmunk"
+  - User confirmation: Subject "CEO - The Written Hug", Preview "Thanks for letting our kabootar carry your words to us"
+  - Reply emails: Subject "CEO - The Written Hug", Preview "Written Hug Sent a Kabootar"
+- **BACKGROUND MUSIC REPLACED**: 
+  - Updated to new audio file (WhatsApp Audio 2025-08-15 at 12.09.54 AM_1755197391594.mp4)
+  - Increased volume to 35% across all pages
+  - Removed fade transitions - simple loop functionality only
+  - Applied to all pages: Index, AdminDashboard, AdminConversation
 - **CRITICAL FIX**: Completely resolved email template issue by replacing Brevo templates with direct HTML content
 - **EMAIL IMAGES UPDATED**: Replaced local images with beautiful Cloudinary header images for all email templates
 - **NEW EMAIL DESIGN**: Updated all email templates to match user's custom HTML design with elegant styling

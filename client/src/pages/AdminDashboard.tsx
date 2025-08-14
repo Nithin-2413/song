@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Eye, Search, Filter, Calendar, User, Mail, Phone, MessageSquare, BarChart3, Users, TrendingUp, Clock, Globe, Heart } from 'lucide-react';
 import logoImage from '@assets/Untitled design (2)_1755165830517.png';
 import { useLocation } from 'wouter';
-import backgroundMusic from '@assets/Evare (PenduJatt.Com.Se)-trimmed_1755178220859.mp3';
+import backgroundMusic from '@assets/WhatsApp Audio 2025-08-15 at 12.09.54 AM_1755197391594.mp4';
 
 interface Hug {
   id: string;
@@ -46,24 +46,15 @@ const AdminDashboard = () => {
     const setupBackgroundMusic = () => {
       if (audioRef.current) {
         const audio = audioRef.current;
-        audio.volume = 0.18;
+        audio.volume = 0.35;
         audio.loop = true;
         
-        const fadeIn = () => {
-          audio.volume = 0;
+        const playMusic = () => {
           audio.play().catch(e => console.log('Audio autoplay prevented:', e));
-          
-          const fadeInInterval = setInterval(() => {
-            if (audio.volume < 0.18) {
-              audio.volume = Math.min(audio.volume + 0.01, 0.18);
-            } else {
-              clearInterval(fadeInInterval);
-            }
-          }, 100);
         };
 
         const startMusic = () => {
-          fadeIn();
+          playMusic();
           document.removeEventListener('click', startMusic);
         };
 

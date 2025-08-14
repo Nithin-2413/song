@@ -11,7 +11,7 @@ import TypingAnimation from '@/components/TypingAnimation';
 import FAQSection from '@/components/FAQSection';
 import WhyWeExistSection from '@/components/WhyWeExistSection';
 import StillNotSureSection from '@/components/StillNotSureSection';
-import backgroundMusic from '@assets/Evare (PenduJatt.Com.Se)-trimmed_1755178220859.mp3';
+import backgroundMusic from '@assets/WhatsApp Audio 2025-08-15 at 12.09.54 AM_1755197391594.mp4';
 
 const Index = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -27,65 +27,26 @@ const Index = () => {
     const setupBackgroundMusic = () => {
       if (audioRef.current) {
         const audio = audioRef.current;
-        audio.volume = 0.18; // Set soft volume (18% - 20% increase from 15%)
+        audio.volume = 0.35; // Set volume to 35%
         audio.loop = true;
         
-        // Add smooth fade transition when looping
-        audio.addEventListener('ended', () => {
-          // Quick fade out and back in for smooth loop transition
-          const quickFadeOut = setInterval(() => {
-            if (audio.volume > 0) {
-              audio.volume = Math.max(audio.volume - 0.02, 0);
-            } else {
-              clearInterval(quickFadeOut);
-              audio.currentTime = 0;
-              
-              // Quick fade back in
-              const quickFadeIn = setInterval(() => {
-                if (audio.volume < 0.18) {
-                  audio.volume = Math.min(audio.volume + 0.02, 0.18);
-                } else {
-                  clearInterval(quickFadeIn);
-                }
-              }, 10);
-            }
-          }, 10);
-        });
-        
-        // Fade in effect
-        const fadeIn = () => {
-          audio.volume = 0;
+        // Simple play function
+        const playMusic = () => {
           audio.play().catch(e => console.log('Audio autoplay prevented:', e));
-          
-          const fadeInInterval = setInterval(() => {
-            if (audio.volume < 0.18) {
-              audio.volume = Math.min(audio.volume + 0.01, 0.18);
-            } else {
-              clearInterval(fadeInInterval);
-            }
-          }, 100);
         };
 
-        // Handle page visibility change for fade in/out
+        // Handle page visibility change
         const handleVisibilityChange = () => {
           if (document.visibilityState === 'visible') {
-            fadeIn();
+            playMusic();
           } else {
-            // Fade out when page becomes hidden
-            const fadeOutInterval = setInterval(() => {
-              if (audio.volume > 0) {
-                audio.volume = Math.max(audio.volume - 0.01, 0);
-              } else {
-                audio.pause();
-                clearInterval(fadeOutInterval);
-              }
-            }, 50);
+            audio.pause();
           }
         };
 
         // Start music after user interaction (required by browsers)
         const startMusic = () => {
-          fadeIn();
+          playMusic();
           document.removeEventListener('click', startMusic);
           document.removeEventListener('keydown', startMusic);
           document.removeEventListener('touchstart', startMusic);

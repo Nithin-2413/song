@@ -142,7 +142,7 @@ export async function sendSubmissionEmail(params: EmailSubmissionParams): Promis
         "email": "thewrittenhug@gmail.com", 
         "name": "The Written Hug Admin"
       }],
-      "subject": `New Message from ${params.name}`,
+      "subject": `We got a Kabootar from ${params.name}`,
       "htmlContent": adminHtmlContent
     };
 
@@ -155,7 +155,7 @@ export async function sendSubmissionEmail(params: EmailSubmissionParams): Promis
         "email": params.email,
         "name": params.name
       }],
-      "subject": "Thank you for your message - The Written Hug",
+      "subject": "CEO - The Written Hug",
       "htmlContent": userHtmlContent
     };
 
@@ -238,7 +238,7 @@ export async function sendReplyEmail(clientEmail: string, params: EmailReplyPara
           name: params.client_name
         }
       ],
-      subject: `Personal Reply from The Written Hug Team`,
+      subject: `CEO - The Written Hug`,
       htmlContent: replyHtmlContent,
       replyTo: {
         email: 'thewrittenhug@gmail.com',

@@ -70,7 +70,7 @@ export function createEmailTemplate(type: 'admin' | 'user' | 'reply', images: Re
 
           <!-- Preheader -->
           <div style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">
-            You've received a new message via The Written Hug. Open to view details.
+            Wakeup Chipmunk
           </div>
 
           <!-- Header Image -->
@@ -132,7 +132,7 @@ export function createEmailTemplate(type: 'admin' | 'user' | 'reply', images: Re
 
           <!-- Preheader -->
           <div style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">
-            Thank you for your message submission to The Written Hug.
+            Thanks for letting our kabootar carry your words to us
           </div>
 
           <!-- Header Image -->
@@ -180,7 +180,7 @@ export function createEmailTemplate(type: 'admin' | 'user' | 'reply', images: Re
 
       <!-- Hidden preview / preheader -->
       <div style="display:none!important;visibility:hidden;opacity:0;height:0;width:0;overflow:hidden;mso-hide:all;">
-        A personal reply to your message from The Written Hug — reply to continue.
+        Written Hug Sent a Kabootar
       </div>
 
       <!-- Header Image -->
