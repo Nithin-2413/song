@@ -27,14 +27,14 @@ const Index = () => {
     const setupBackgroundMusic = () => {
       if (audioRef.current) {
         const audio = audioRef.current;
-        audio.volume = 0.15; // Set volume to 15% for softer sound
+        audio.volume = 0.10; // Set volume to 10% for very soft ambient sound
         audio.loop = true;
         audio.preload = 'auto';
         audio.autoplay = true;
         audio.muted = false;
         
-        // Smooth fade out function (2 seconds)
-        const fadeOut = (duration = 2000) => {
+        // Smooth fade out function (3 seconds)
+        const fadeOut = (duration = 3000) => {
           const startVolume = audio.volume;
           const steps = 60; // 60 steps for smooth fade
           const volumeStep = startVolume / steps;
@@ -50,65 +50,89 @@ const Index = () => {
           }, timeStep);
         };
 
-        // Auto-play music with aggressive mobile support
-        const playMusic = async () => {
+        // Smooth fade in function (3 seconds)
+        const fadeIn = (targetVolume = 0.10, duration = 3000) => {
+          audio.volume = 0;
+          const steps = 60;
+          const volumeStep = targetVolume / steps;
+          const timeStep = duration / steps;
+          
+          const fadeInterval = setInterval(() => {
+            if (audio.volume < targetVolume) {
+              audio.volume = Math.min(audio.volume + volumeStep, targetVolume);
+            } else {
+              clearInterval(fadeInterval);
+            }
+          }, timeStep);
+        };
+
+        // Auto-play music with fade in
+        const playMusic = async (useFadeIn = true) => {
           try {
             await audio.play();
-            console.log('Music started automatically');
+            if (useFadeIn) {
+              fadeIn(0.10, 3000);
+            } else {
+              audio.volume = 0.10;
+            }
+            console.log('Music started automatically with fade in');
           } catch (e) {
-            console.log('Auto-play prevented, setting up interaction listeners:', e);
-            // Multiple fallback strategies for mobile
-            const startOnInteraction = () => {
-              audio.play().then(() => {
-                console.log('Music started after user interaction');
-                // Remove all listeners once music starts
-                document.removeEventListener('click', startOnInteraction);
-                document.removeEventListener('touchstart', startOnInteraction);
-                document.removeEventListener('touchend', startOnInteraction);
-                document.removeEventListener('keydown', startOnInteraction);
-                document.removeEventListener('scroll', startOnInteraction);
-                window.removeEventListener('focus', startOnInteraction);
-              }).catch(console.log);
-            };
-            
-            // Add multiple interaction listeners for better mobile coverage
-            document.addEventListener('click', startOnInteraction, { once: true });
-            document.addEventListener('touchstart', startOnInteraction, { once: true });
-            document.addEventListener('touchend', startOnInteraction, { once: true });
-            document.addEventListener('keydown', startOnInteraction, { once: true });
-            document.addEventListener('scroll', startOnInteraction, { once: true });
-            window.addEventListener('focus', startOnInteraction, { once: true });
+            console.log('Auto-play prevented, trying alternative methods:', e);
+            // Try starting with muted first, then unmute
+            audio.muted = true;
+            try {
+              await audio.play();
+              audio.muted = false;
+              if (useFadeIn) {
+                fadeIn(0.10, 3000);
+              } else {
+                audio.volume = 0.10;
+              }
+              console.log('Music started with muted workaround');
+            } catch (e2) {
+              console.log('All auto-play methods failed, music will start on first interaction');
+            }
           }
         };
 
-        // Handle page visibility change with fade out
+        // Handle page visibility change with fade out/in
         const handleVisibilityChange = () => {
           if (document.visibilityState === 'visible') {
-            audio.volume = 0.15;
-            playMusic();
+            playMusic(true); // Use fade in
           } else {
-            fadeOut(2000); // 2 second fade out
+            fadeOut(3000); // 3 second fade out
           }
         };
 
-        // Force immediate play attempt
-        const forcePlay = () => {
-          audio.currentTime = 0;
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
-              console.log('Music started immediately');
-            }).catch(() => {
-              console.log('Immediate play blocked, setting up interaction triggers');
+        // Try multiple strategies for automatic playback
+        const attemptAutoPlay = async () => {
+          // Strategy 1: Direct play with fade in
+          await playMusic(true);
+          
+          // Strategy 2: Try again after short delay
+          setTimeout(async () => {
+            if (audio.paused) {
+              await playMusic(false);
+            }
+          }, 500);
+          
+          // Strategy 3: Use intersection observer to start when page is visible
+          const observer = new IntersectionObserver((entries) => {
+            entries.forEach(async (entry) => {
+              if (entry.isIntersecting && audio.paused) {
+                await playMusic(true);
+                observer.disconnect();
+              }
             });
+          });
+          
+          const body = document.body;
+          if (body) {
+            observer.observe(body);
           }
         };
 
-        // Try multiple immediate strategies
-        forcePlay();
-        
-        // Also set up the regular auto-play system
-        playMusic();
+        attemptAutoPlay();
         
         document.addEventListener('visibilitychange', handleVisibilityChange);
 

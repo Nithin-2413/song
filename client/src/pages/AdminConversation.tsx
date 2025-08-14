@@ -55,7 +55,7 @@ const AdminConversation = () => {
     const setupBackgroundMusic = () => {
       if (audioRef.current) {
         const audio = audioRef.current;
-        audio.volume = 0.15;
+        audio.volume = 0.10;
         audio.loop = true;
         audio.preload = 'auto';
         audio.autoplay = true;
