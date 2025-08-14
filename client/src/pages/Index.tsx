@@ -66,7 +66,7 @@ const Index = () => {
           }, timeStep);
         };
 
-        // Auto-play music with fade in
+        // Simple mobile-friendly music play
         const playMusic = async (useFadeIn = true) => {
           try {
             await audio.play();
@@ -77,21 +77,27 @@ const Index = () => {
             }
             console.log('Music started automatically with fade in');
           } catch (e) {
-            console.log('Auto-play prevented, trying alternative methods:', e);
-            // Try starting with muted first, then unmute
-            audio.muted = true;
-            try {
-              await audio.play();
-              audio.muted = false;
-              if (useFadeIn) {
-                fadeIn(0.10, 3000);
-              } else {
-                audio.volume = 0.10;
-              }
-              console.log('Music started with muted workaround');
-            } catch (e2) {
-              console.log('All auto-play methods failed, music will start on first interaction');
-            }
+            console.log('Auto-play prevented, setting up mobile triggers:', e);
+            // Simple mobile interaction listeners
+            const startMusic = () => {
+              audio.play().then(() => {
+                if (useFadeIn) {
+                  fadeIn(0.10, 3000);
+                } else {
+                  audio.volume = 0.10;
+                }
+                console.log('Music started on mobile interaction');
+                // Clean up listeners
+                document.removeEventListener('touchstart', startMusic);
+                document.removeEventListener('click', startMusic);
+                document.removeEventListener('scroll', startMusic);
+              }).catch(console.log);
+            };
+            
+            // Add listeners for mobile interactions
+            document.addEventListener('touchstart', startMusic, { once: true, passive: true });
+            document.addEventListener('click', startMusic, { once: true });
+            document.addEventListener('scroll', startMusic, { once: true, passive: true });
           }
         };
 
@@ -104,35 +110,8 @@ const Index = () => {
           }
         };
 
-        // Try multiple strategies for automatic playback
-        const attemptAutoPlay = async () => {
-          // Strategy 1: Direct play with fade in
-          await playMusic(true);
-          
-          // Strategy 2: Try again after short delay
-          setTimeout(async () => {
-            if (audio.paused) {
-              await playMusic(false);
-            }
-          }, 500);
-          
-          // Strategy 3: Use intersection observer to start when page is visible
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach(async (entry) => {
-              if (entry.isIntersecting && audio.paused) {
-                await playMusic(true);
-                observer.disconnect();
-              }
-            });
-          });
-          
-          const body = document.body;
-          if (body) {
-            observer.observe(body);
-          }
-        };
-
-        attemptAutoPlay();
+        // Start music immediately
+        playMusic(true);
         
         document.addEventListener('visibilitychange', handleVisibilityChange);
 

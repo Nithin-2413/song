@@ -61,45 +61,29 @@ const AdminConversation = () => {
         audio.autoplay = true;
         audio.muted = false;
         
-        // Auto-play music with aggressive mobile support
+        // Simple mobile music play
         const playMusic = async () => {
           try {
             await audio.play();
             console.log('Music started automatically');
           } catch (e) {
-            console.log('Auto-play prevented, setting up interaction listeners:', e);
-            const startOnInteraction = () => {
+            console.log('Auto-play prevented, setting up mobile triggers:', e);
+            const startMusic = () => {
               audio.play().then(() => {
-                console.log('Music started after user interaction');
-                document.removeEventListener('click', startOnInteraction);
-                document.removeEventListener('touchstart', startOnInteraction);
-                document.removeEventListener('touchend', startOnInteraction);
-                document.removeEventListener('scroll', startOnInteraction);
+                console.log('Music started on mobile interaction');
+                document.removeEventListener('touchstart', startMusic);
+                document.removeEventListener('click', startMusic);
+                document.removeEventListener('scroll', startMusic);
               }).catch(console.log);
             };
             
-            document.addEventListener('click', startOnInteraction, { once: true });
-            document.addEventListener('touchstart', startOnInteraction, { once: true });
-            document.addEventListener('touchend', startOnInteraction, { once: true });
-            document.addEventListener('scroll', startOnInteraction, { once: true });
+            document.addEventListener('touchstart', startMusic, { once: true, passive: true });
+            document.addEventListener('click', startMusic, { once: true });
+            document.addEventListener('scroll', startMusic, { once: true, passive: true });
           }
         };
 
-        // Force immediate play attempt
-        const forcePlay = () => {
-          audio.currentTime = 0;
-          const playPromise = audio.play();
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
-              console.log('Music started immediately');
-            }).catch(() => {
-              console.log('Immediate play blocked, setting up interaction triggers');
-            });
-          }
-        };
-
-        // Try immediate strategies
-        forcePlay();
+        // Start music
         playMusic();
       }
     };
